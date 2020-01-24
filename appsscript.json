@@ -1,0 +1,11 @@
+{
+  "timeZone": "Europe/Paris",
+  "dependencies": {
+    "libraries": [{
+      "userSymbol": "exportspreadsheet",
+      "libraryId": "1XgUnRIGc3oOvbyWcavQcw8N_zOGpp8uNPiyMsI6MVzyMOx2lwezmnRYY",
+      "version": "3"
+    }]
+  },
+  "exceptionLogging": "STACKDRIVER"
+}
