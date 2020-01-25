@@ -27,21 +27,48 @@ function exportPartsToDatabase() {
 }
 
 function getPartsInServiceMode() {
-    var firstPartsRow = SPREADSHEET.sheets.serviceSheet.serviceMode.firstEntryRow;
-    var nonFilteredParts = getPartsWithQuantityNonFiltered(firstPartsRow);
-    var filteredParts = nonFilteredParts.filter(function (e) { return e[0] !== '' });
-    return filteredParts;
-}
-
-function getPartsInRepairMode() {
-    var ignoreKey = 'Part no';
+    var beforeAdditionalPartsKey = 'Part no';
     var stopKey = 'Comments';
     var firstPartsRow = SPREADSHEET.sheets.serviceSheet.serviceMode.firstEntryRow;
     var nonFilteredParts = getPartsWithQuantityNonFiltered(firstPartsRow);
-    // Truncate parts array: Stop at first occurence of 'Comments'
-    var truncatedParts = nonFilteredParts.slice(nonFilteredParts.indexOf(0, stopKey));
-    var filteredParts = truncatedParts.filter(function (e) { return e[0] !== '' && e[0] !== ignoreKey});
-    return filteredParts;
+    var filteredParts = nonFilteredParts.filter(function (e) { return e[0] !== '' });
+
+    var beforeAdditionalPartsIndex = nonFilteredParts.indexOf(beforeAdditionalPartsKey);
+    var stopIndex = nonFilteredParts.indexOf(stopKey);
+    var replaceParts =  nonFilteredParts.slice(0, beforeAdditionalPartsIndex);
+    var additionalParts =  nonFilteredParts.slice(beforeAdditionalPartsIndex, stopIndex);
+
+    var date = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.taskDateCell);
+    var equipmentNo = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.equipmentNumberCell);
+    var type = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.typeCell);
+    var task = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.taskTypeCell);
+
+    var transformedReplaceParts = replaceParts.map(function (e) {
+        return [date, equipmentNo, type, task, e[0], 1];
+    });
+
+    var transformeAdditionalParts = additionalParts.map(function (e) {
+        return [date, equipmentNo, type, task, e[0], e[1]];
+    });
+
+    return transformedReplaceParts.concat(transformeAdditionalParts);
+}
+
+function getPartsInRepairMode() {
+    var firstPartsRow = SPREADSHEET.sheets.serviceSheet.serviceMode.firstEntryRow;
+    var nonFilteredParts = getPartsWithQuantityNonFiltered(firstPartsRow);
+    var filteredParts = nonFilteredParts.filter(function (e) { return e[0] !== '' });
+
+    var serviceSheet = SPREADSHEET.sheets.serviceSheet.sheet;
+    var date = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.taskDateCell);
+    var equipmentNo = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.equipmentNumberCell);
+    var type = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.typeCell);
+    var task = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.taskTypeCell);
+
+    var retVal = filteredParts.map(function (e) {
+        return [date, equipmentNo, type, task, e[0], e[1]];
+    });
+    return retVal;
 }
 
 function sendPartsToDatabase(parts) {
