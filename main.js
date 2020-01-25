@@ -11,7 +11,15 @@ var SPREADSHEET = {
             machineHoursCell: 'C13',
             taskDateCell: 'C6',
             importTaskListButtonCell: 'J5',
-            exportSheetButtonCell: 'J10'
+            exportSheetButtonCell: 'J10',
+            partsCol: ColumnNames.letterToColumn('D'),
+            quantityCol: ColumnNames.letterToColumn('E'),
+            serviceMode: {
+                firstEntryRow: 16
+            },
+            repairMode: {
+                firstEntryRow: 17
+            }
 
         },
         servicePerTypeSheet: {
@@ -176,7 +184,7 @@ function exportToPdf() {
 //    ExportSpreadsheet.export(exportOptions);
     var pdfFile = exportspreadsheet.export(exportOptions);
      sendEmail(pdfFile);
-
+     exportPartsToDatabase();
 }
 
 function sendEmail(attachment) {
