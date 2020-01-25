@@ -94,10 +94,10 @@ function getDatabaseFirstEmptyRow() {
  * @returns {*}
  */
 function getPartsWithQuantityNonFiltered(firstrow) {
-    var range = SPREADSHEET.sheets.serviceSheet.getRange(
+    var range = SPREADSHEET.sheets.serviceSheet.sheet.getRange(
         firstrow,
         SPREADSHEET.sheets.serviceSheet.partsCol,
         SPREADSHEET.sheets.serviceSheet.getLastRow() + firstrow + 1,
-        SPREADSHEET.sheets.serviceSheet.quantityCol - SPREADSHEET.sheets.serviceSheet.partsCol + 1);
+        SPREADSHEET.sheets.serviceSheet.sheet.quantityCol - SPREADSHEET.sheets.serviceSheet.partsCol + 1);
     return range.getValues();
 }
