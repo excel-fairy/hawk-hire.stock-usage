@@ -1,14 +1,16 @@
 var DATA_TYPE = 'Generator';
 
 var DATABASE_SPREADSHEET = {
-        getSpreadsheet: function() { return SpreadsheetApp.openById(DATABASE_SPREADSHEET_ID); },
-        getSheet: function() { return DATABASE_SPREADSHEET.getSpreadsheet().getSheetByName("database"); },
         partsFirstCol: ColumnNames.letterToColumn('A'),
         partsLastCol: ColumnNames.letterToColumn('F'),
         partsFirstRow: '3'
-    };
+};
 
-    /**
+function getDatabaseSheet() {
+    return SpreadsheetApp.openById(DATABASE_SPREADSHEET_ID).getSheetByName("Sheet1");
+}
+
+/**
  * Export all parts in the database spreadsheet
  */
 function exportPartsToDatabase() {
@@ -38,10 +40,10 @@ function getPartsInServiceMode() {
     var replaceParts =  nonFilteredParts.slice(0, beforeAdditionalPartsIndex);
     var additionalParts =  nonFilteredParts.slice(beforeAdditionalPartsIndex, stopIndex);
 
-    var date = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.taskDateCell);
-    var equipmentNo = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.equipmentNumberCell);
-    var type = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.typeCell);
-    var task = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.taskTypeCell);
+    var date = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.taskDateCell).getValue();
+    var equipmentNo = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.equipmentNumberCell).getValue();
+    var type = DATA_TYPE;
+    var task = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.taskTypeCell).getValue();
 
     var transformedReplaceParts = replaceParts.map(function (e) {
         return [date, equipmentNo, type, task, e[0], 1];
@@ -55,15 +57,15 @@ function getPartsInServiceMode() {
 }
 
 function getPartsInRepairMode() {
-    var firstPartsRow = SPREADSHEET.sheets.serviceSheet.serviceMode.firstEntryRow;
+    var firstPartsRow = SPREADSHEET.sheets.serviceSheet.repairMode.firstEntryRow;
     var nonFilteredParts = getPartsWithQuantityNonFiltered(firstPartsRow);
     var filteredParts = nonFilteredParts.filter(function (e) { return e[0] !== '' });
 
     var serviceSheet = SPREADSHEET.sheets.serviceSheet.sheet;
-    var date = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.taskDateCell);
-    var equipmentNo = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.equipmentNumberCell);
-    var type = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.typeCell);
-    var task = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.taskTypeCell);
+    var date = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.taskDateCell).getValue();
+    var equipmentNo = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.equipmentNumberCell).getValue();
+    var type = DATA_TYPE;
+    var task = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.taskTypeCell).getValue();
 
     var retVal = filteredParts.map(function (e) {
         return [date, equipmentNo, type, task, e[0], e[1]];
@@ -72,7 +74,7 @@ function getPartsInRepairMode() {
 }
 
 function sendPartsToDatabase(parts) {
-    var dbSheet = DATABASE_SPREADSHEET.getSheet();
+    var dbSheet = getDatabaseSheet();
     var firstEmptyRow = getDatabaseFirstEmptyRow();
     var  insertRange = dbSheet.getRange(
         firstEmptyRow,
@@ -83,8 +85,8 @@ function sendPartsToDatabase(parts) {
 }
 
 function getDatabaseFirstEmptyRow() {
-    var dbSheet = DATABASE_SPREADSHEET.getSheet();
-    return Math.min(dbSheet.getLastRow(), DATABASE_SPREADSHEET.partsFirstRow) + 1;
+    var dbSheet = getDatabaseSheet();
+    return Math.max(dbSheet.getLastRow(), DATABASE_SPREADSHEET.partsFirstRow) + 1;
 }
 
 /**
@@ -97,7 +99,7 @@ function getPartsWithQuantityNonFiltered(firstrow) {
     var range = SPREADSHEET.sheets.serviceSheet.sheet.getRange(
         firstrow,
         SPREADSHEET.sheets.serviceSheet.partsCol,
-        SPREADSHEET.sheets.serviceSheet.getLastRow() + firstrow + 1,
-        SPREADSHEET.sheets.serviceSheet.sheet.quantityCol - SPREADSHEET.sheets.serviceSheet.partsCol + 1);
+        SPREADSHEET.sheets.serviceSheet.sheet.getLastRow() + firstrow + 1,
+        SPREADSHEET.sheets.serviceSheet.quantityCol - SPREADSHEET.sheets.serviceSheet.partsCol + 1);
     return range.getValues();
 }
