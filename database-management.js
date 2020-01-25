@@ -35,11 +35,12 @@ function getPartsInServiceMode() {
     var nonFilteredParts = getPartsWithQuantityNonFiltered(firstPartsRow);
     var filteredParts = nonFilteredParts.filter(function (e) { return e[0] !== '' });
 
-    var beforeAdditionalPartsIndex = nonFilteredParts.indexOf(beforeAdditionalPartsKey);
-    var stopIndex = nonFilteredParts.indexOf(stopKey);
-    var replaceParts =  nonFilteredParts.slice(0, beforeAdditionalPartsIndex);
-    var additionalParts =  nonFilteredParts.slice(beforeAdditionalPartsIndex, stopIndex);
+    var beforeAdditionalPartsIndex = getIndexOfKeyIn2DArray(filteredParts, beforeAdditionalPartsKey);
+    var stopIndex = getIndexOfKeyIn2DArray(filteredParts, stopKey);
+    var replaceParts = filteredParts.slice(0, beforeAdditionalPartsIndex);
+    var additionalParts = filteredParts.slice(beforeAdditionalPartsIndex + 1, stopIndex);
 
+    var serviceSheet = SPREADSHEET.sheets.serviceSheet.sheet;
     var date = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.taskDateCell).getValue();
     var equipmentNo = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.equipmentNumberCell).getValue();
     var type = DATA_TYPE;
@@ -102,4 +103,16 @@ function getPartsWithQuantityNonFiltered(firstrow) {
         SPREADSHEET.sheets.serviceSheet.sheet.getLastRow() + firstrow + 1,
         SPREADSHEET.sheets.serviceSheet.quantityCol - SPREADSHEET.sheets.serviceSheet.partsCol + 1);
     return range.getValues();
+}
+
+/**
+ * Get the index of the key (content of first column) of a 2D array
+ */
+function getIndexOfKeyIn2DArray(array, key) {
+    for (var i = 0; i < array.length; i++) {
+        if (array[i][0] === key) {
+            return i;
+        }
+    }
+    return -1;
 }
