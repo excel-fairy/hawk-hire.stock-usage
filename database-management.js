@@ -1,8 +1,8 @@
 var DATA_TYPE = 'Generator';
 
 var DATABASE_SPREADSHEET = {
-        getSpreadsheet: () => { return SpreadsheetApp.openById(DATABASE_SPREADSHEET_ID); },
-        getSheet: () => { return DATABASE_SPREADSHEET.getSpreadsheet().getSheetByName("database"); },
+        getSpreadsheet: function() { return SpreadsheetApp.openById(DATABASE_SPREADSHEET_ID); },
+        getSheet: function() { return DATABASE_SPREADSHEET.getSpreadsheet().getSheetByName("database"); },
         partsFirstCol: ColumnNames.letterToColumn('A'),
         partsLastCol: ColumnNames.letterToColumn('F'),
         partsFirstRow: '3'
