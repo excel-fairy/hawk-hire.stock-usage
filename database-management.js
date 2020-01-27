@@ -31,7 +31,7 @@ function exportPartsToDatabase() {
 function getPartsInServiceMode() {
     var beforeAdditionalPartsKey = 'Part no';
     var stopKey = 'Comments';
-    var firstPartsRow = SPREADSHEET.sheets.serviceSheet.serviceMode.firstEntryRow;
+    var firstPartsRow = SPREADSHEET.sheets.service.serviceMode.firstEntryRow;
     var nonFilteredParts = getPartsWithQuantityNonFiltered(firstPartsRow);
     var filteredParts = nonFilteredParts.filter(function (e) { return e[0] !== '' });
 
@@ -40,11 +40,11 @@ function getPartsInServiceMode() {
     var replaceParts = filteredParts.slice(0, beforeAdditionalPartsIndex);
     var additionalParts = filteredParts.slice(beforeAdditionalPartsIndex + 1, stopIndex);
 
-    var serviceSheet = SPREADSHEET.sheets.serviceSheet.sheet;
-    var date = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.taskDateCell).getValue();
-    var equipmentNo = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.equipmentNumberCell).getValue();
+    var serviceSheet = SPREADSHEET.sheets.service.sheet;
+    var date = serviceSheet.getRange(SPREADSHEET.sheets.service.taskDateCell).getValue();
+    var equipmentNo = serviceSheet.getRange(SPREADSHEET.sheets.service.equipmentNumberCell).getValue();
     var type = DATA_TYPE;
-    var task = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.taskTypeCell).getValue();
+    var task = serviceSheet.getRange(SPREADSHEET.sheets.service.taskTypeCell).getValue();
 
     var transformedReplaceParts = replaceParts.map(function (e) {
         return [date, equipmentNo, type, task, e[0], 1];
@@ -58,15 +58,15 @@ function getPartsInServiceMode() {
 }
 
 function getPartsInRepairMode() {
-    var firstPartsRow = SPREADSHEET.sheets.serviceSheet.repairMode.firstEntryRow;
+    var firstPartsRow = SPREADSHEET.sheets.service.repairMode.firstEntryRow;
     var nonFilteredParts = getPartsWithQuantityNonFiltered(firstPartsRow);
     var filteredParts = nonFilteredParts.filter(function (e) { return e[0] !== '' });
 
-    var serviceSheet = SPREADSHEET.sheets.serviceSheet.sheet;
-    var date = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.taskDateCell).getValue();
-    var equipmentNo = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.equipmentNumberCell).getValue();
+    var serviceSheet = SPREADSHEET.sheets.service.sheet;
+    var date = serviceSheet.getRange(SPREADSHEET.sheets.service.taskDateCell).getValue();
+    var equipmentNo = serviceSheet.getRange(SPREADSHEET.sheets.service.equipmentNumberCell).getValue();
     var type = DATA_TYPE;
-    var task = serviceSheet.getRange(SPREADSHEET.sheets.serviceSheet.taskTypeCell).getValue();
+    var task = serviceSheet.getRange(SPREADSHEET.sheets.service.taskTypeCell).getValue();
 
     var retVal = filteredParts.map(function (e) {
         return [date, equipmentNo, type, task, e[0], e[1]];
@@ -97,11 +97,11 @@ function getDatabaseFirstEmptyRow() {
  * @returns {*}
  */
 function getPartsWithQuantityNonFiltered(firstrow) {
-    var range = SPREADSHEET.sheets.serviceSheet.sheet.getRange(
+    var range = SPREADSHEET.sheets.service.sheet.getRange(
         firstrow,
-        SPREADSHEET.sheets.serviceSheet.partsCol,
-        SPREADSHEET.sheets.serviceSheet.sheet.getLastRow() + firstrow + 1,
-        SPREADSHEET.sheets.serviceSheet.quantityCol - SPREADSHEET.sheets.serviceSheet.partsCol + 1);
+        SPREADSHEET.sheets.service.partsCol,
+        SPREADSHEET.sheets.service.sheet.getLastRow() + firstrow + 1,
+        SPREADSHEET.sheets.service.quantityCol - SPREADSHEET.sheets.service.partsCol + 1);
     return range.getValues();
 }
 

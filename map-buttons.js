@@ -1,6 +1,6 @@
 function onOpen() {
-    SPREADSHEET.sheets.serviceSheet.sheet.getRange(SPREADSHEET.sheets.serviceSheet.importTaskListButtonCell).setValue(false);
-    SPREADSHEET.sheets.serviceSheet.sheet.getRange(SPREADSHEET.sheets.serviceSheet.exportSheetButtonCell).setValue(false);
+    SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.importTaskListButtonCell).setValue(false);
+    SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.exportSheetButtonCell).setValue(false);
     SpreadsheetApp.getUi()
         .createMenu('Run scripts')
         .addItem('Import Task List', 'importTaskList')
@@ -19,14 +19,14 @@ function createInstallableTriggers(){
 
 function installableOnEdit(e){
     var range = e.range;
-    if(range.getSheet().getName() === SPREADSHEET.sheets.serviceSheet.sheet.getRange(SPREADSHEET.sheets.serviceSheet.importTaskListButtonCell).getSheet().getName()
-        && range.getA1Notation() === SPREADSHEET.sheets.serviceSheet.sheet.getRange(SPREADSHEET.sheets.serviceSheet.importTaskListButtonCell).getA1Notation()
+    if(range.getSheet().getName() === SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.importTaskListButtonCell).getSheet().getName()
+        && range.getA1Notation() === SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.importTaskListButtonCell).getA1Notation()
         && range.getValue() === true){
         range.setValue(false);
         importTaskList();
     }
-    else if(range.getSheet().getName() === SPREADSHEET.sheets.serviceSheet.sheet.getRange(SPREADSHEET.sheets.serviceSheet.exportSheetButtonCell).getSheet().getName()
-        && range.getA1Notation() === SPREADSHEET.sheets.serviceSheet.sheet.getRange(SPREADSHEET.sheets.serviceSheet.exportSheetButtonCell).getA1Notation()
+    else if(range.getSheet().getName() === SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.exportSheetButtonCell).getSheet().getName()
+        && range.getA1Notation() === SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.exportSheetButtonCell).getA1Notation()
         && range.getValue() === true){
         range.setValue(false);
         exportToPdf();

@@ -1,7 +1,7 @@
 var SPREADSHEET = {
     spreadSheet: SpreadsheetApp.getActiveSpreadsheet(),
     sheets: {
-        serviceSheet:{
+        service:{
             sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Service sheet"),
             equipmentNumberCell: 'E6',
             taskListNameCell: 'B14',
@@ -22,13 +22,27 @@ var SPREADSHEET = {
             }
 
         },
-        servicePerTypeSheet: {
+        servicePerType: {
             sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Service per type"),
             rowsInTaskListCell: 'E1',
             commentCellRowCell: 'F1',
             sourceDataRange: 'B2:E70'
         },
-        dataValidSheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Data Valid")
+        serviceTaskList: {
+            sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("service task list"),
+            rowsInTaskListCell: 'AE6',
+            commentCellRowCell: 'AE6',
+            sourceDataRange: 'A2:A3'
+        },
+        dataValidation: {
+            sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("data validation"),
+        },
+         emailAutomation: {
+            sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("email automation"),
+        },
+
+
+        dataValid: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Data Valid")
 
     }
 };
@@ -54,60 +68,61 @@ var TASK_LIST_COORDINATES = {
 function importTaskList() {
     clearTaskList();
 
-    SPREADSHEET.sheets.servicePerTypeSheet.sheet.getRange(SPREADSHEET.sheets.servicePerTypeSheet.sourceDataRange)
-        .copyTo(SPREADSHEET.sheets.serviceSheet.sheet
-                .getRange(SPREADSHEET.sheets.serviceSheet.topLefCellOfTaskList),
+    SPREADSHEET.sheets.serviceTaskList.sheet.getRange(SPREADSHEET.sheets.serviceTaskList.sourceDataRange)
+        .copyTo(SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.topLefCellOfTaskList),
             {contentsOnly: true});
 
 
-    var nbTasks = getNbTasks();
+    // todo
+    var nbTasks = getNbTasks(); /* check */
     var taskRange = getTasksListRange(nbTasks);
     taskRange.setBorder(true, true, true, true, false, false);
     highlightKeyWordCells(taskRange);
 
     if (serviceSheetIsRepairMode() || serviceSheetIsInspectionMode()){
-        var commentCellRow = SPREADSHEET.sheets.servicePerTypeSheet.sheet.getRange(SPREADSHEET.sheets.servicePerTypeSheet.commentCellRowCell).getValue();
-        SPREADSHEET.sheets.serviceSheet.sheet.getRange(commentCellRow, TASK_LIST_COORDINATES.col, 1, TASK_LIST_COORDINATES.nbCols).setBackground(BEIGE);
+        var commentCellRow = SPREADSHEET.sheets.serviceTaskList.sheet.getRange(SPREADSHEET.sheets.serviceTaskList.commentCellRowCell).getValue();
+        SPREADSHEET.sheets.service.sheet.getRange(commentCellRow, TASK_LIST_COORDINATES.col, 1, TASK_LIST_COORDINATES.nbCols).setBackground(BEIGE);
         if(serviceSheetIsRepairMode()) {
-            var firstLineOfColumnBox = SPREADSHEET.sheets.serviceSheet.sheet.getRange(TASK_LIST_COORDINATES.row + 1, TASK_LIST_COORDINATES.col, 1, 4);
+            var firstLineOfColumnBox = SPREADSHEET.sheets.service.sheet.getRange(TASK_LIST_COORDINATES.row + 1, TASK_LIST_COORDINATES.col, 1, 4);
             firstLineOfColumnBox.setValues([['Part used', null, 'Part no', 'Qty']]); // Second parameter is null because two columns are merged and we need to skip the merged column
             firstLineOfColumnBox.setFontWeight('bold');
-            var penultimateLineFirstColOfCommentBox = SPREADSHEET.sheets.serviceSheet.sheet.getRange(TASK_LIST_COORDINATES.row + getNbTasks() - 2, TASK_LIST_COORDINATES.col);
+            var penultimateLineFirstColOfCommentBox = SPREADSHEET.sheets.service.sheet.getRange(TASK_LIST_COORDINATES.row + getNbTasks() - 2, TASK_LIST_COORDINATES.col);
             penultimateLineFirstColOfCommentBox.setValue('Total number of hours of the job:');
             penultimateLineFirstColOfCommentBox.setFontWeight('bold');
         }
     }
 
-    SPREADSHEET.sheets.serviceSheet.sheet.getRange(TASK_LIST_COORDINATES.row, TASK_LIST_COORDINATES.col + TASK_LIST_COORDINATES.nbCols - 1, MAX_NB_TASKS, 1).setDataValidation(null);
+    SPREADSHEET.sheets.service.sheet.getRange(
+        TASK_LIST_COORDINATES.row, TASK_LIST_COORDINATES.col + TASK_LIST_COORDINATES.nbCols - 1, MAX_NB_TASKS, 1)
+        .setDataValidation(null);
 
     if (serviceSheetIsServiceMode())
         setTaskListDataValidationRules();
 }
 
 function setTaskListDataValidationRules(){
-    // var startRange1 = SPREADSHEET.sheets.dataValidSheet.getRange("Z4").getValue();
-    var endRange1 = SPREADSHEET.sheets.dataValidSheet.getRange("Z5").getValue();
-    var startRange2 = SPREADSHEET.sheets.dataValidSheet.getRange("Z7").getValue();
-    var endRange2 = SPREADSHEET.sheets.dataValidSheet.getRange("Z8").getValue();
-    var dataValidYesNo1 = SPREADSHEET.sheets.serviceSheet.sheet.getRange(16,5,endRange1-15,1);
-    var dataValidYesNo2 = SPREADSHEET.sheets.serviceSheet.sheet.getRange(startRange2+1,5,endRange2-startRange2,1);
-    var yes = SPREADSHEET.sheets.servicePerTypeSheet.sheet.getRange("F2").getValue();
-    var no = SPREADSHEET.sheets.servicePerTypeSheet.sheet.getRange("F3").getValue();
+    var endRange1 = SPREADSHEET.sheets.serviceTaskList.getRange("AH8").getValue();
+    var startRange2 = SPREADSHEET.sheets.serviceTaskList.getRange("AH9").getValue();
+    var endRange2 = SPREADSHEET.sheets.serviceTaskList.getRange("AH10").getValue();
+    var dataValidYesNo1 = SPREADSHEET.sheets.service.sheet.getRange(16,5,endRange1-15,1);
+    var dataValidYesNo2 = SPREADSHEET.sheets.service.sheet.getRange(startRange2+1,5,endRange2-startRange2,1);
+    var yes = SPREADSHEET.sheets.dataValidation.sheet.getRange("A2").getValue();
+    var no = SPREADSHEET.sheets.dataValidation.sheet.getRange("A3").getValue();
     var ruleYesNo = SpreadsheetApp.newDataValidation().requireValueInList([yes,no]).build();
     dataValidYesNo1.setDataValidation(ruleYesNo);
     dataValidYesNo2.setDataValidation(ruleYesNo);
 }
 
 function getTasksListRange(nbLines){
-    return SPREADSHEET.sheets.serviceSheet.sheet.getRange(TASK_LIST_COORDINATES.row, TASK_LIST_COORDINATES.col, nbLines, TASK_LIST_COORDINATES.nbCols);
+    return SPREADSHEET.sheets.service.sheet.getRange(TASK_LIST_COORDINATES.row, TASK_LIST_COORDINATES.col, nbLines, TASK_LIST_COORDINATES.nbCols);
 }
 
 function getTasksListStartLineEndLine(startLineOffset, endLineOffset){
-    return SPREADSHEET.sheets.serviceSheet.sheet.getRange(TASK_LIST_COORDINATES.row + startLineOffset, TASK_LIST_COORDINATES.col, endLineOffset, TASK_LIST_COORDINATES.nbCols);
+    return SPREADSHEET.sheets.service.sheet.getRange(TASK_LIST_COORDINATES.row + startLineOffset, TASK_LIST_COORDINATES.col, endLineOffset, TASK_LIST_COORDINATES.nbCols);
 }
 
 function getNbTasks(){
-    return SPREADSHEET.sheets.servicePerTypeSheet.sheet.getRange(SPREADSHEET.sheets.servicePerTypeSheet.rowsInTaskListCell).getValue();
+    return SPREADSHEET.sheets.serviceTaskList.sheet.getRange(SPREADSHEET.sheets.serviceTaskList.rowsInTaskListCell).getValue();
 }
 
 function clearTaskList(){
@@ -144,30 +159,32 @@ function serviceSheetIsRepairMode(){
 }
 
 function getTask(){
-    return SPREADSHEET.sheets.serviceSheet.sheet.getRange(SPREADSHEET.sheets.serviceSheet.taskTypeCell).getValue();
+    return SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.taskTypeCell).getValue();
 }
 
 function getEquipmentNumber(){
-    return SPREADSHEET.sheets.serviceSheet.sheet.getRange(SPREADSHEET.sheets.serviceSheet.equipmentNumberCell).getValue();
+    return SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.equipmentNumberCell).getValue();
 }
 function getMachineHours(){
-    return SPREADSHEET.sheets.serviceSheet.sheet.getRange(SPREADSHEET.sheets.serviceSheet.machineHoursCell).getValue();
+    return SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.machineHoursCell).getValue();
 }
 function getTaskType(){
-    var type = SPREADSHEET.sheets.serviceSheet.sheet.getRange(SPREADSHEET.sheets.serviceSheet.typeCell).getValue();
-    var hrSuffix = " hr";
+    var type = SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.typeCell).getValue();
+    // todo
+    var hrSuffix = " hr"; /* Je pense que ca doit peut etre etre change ici puisque j'ai enleve le hr aux service types, c'est juste le nombre maintenant*/
     if(type.substring(type.length - hrSuffix.length) === hrSuffix)
         type = type.substring(0, type.length - hrSuffix.length);
     return type;
 }
 function getTaskDate(){
-    return SPREADSHEET.sheets.serviceSheet.sheet.getRange(SPREADSHEET.sheets.serviceSheet.taskDateCell).getValue();
+    return SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.taskDateCell).getValue();
 }
 
-function exportToPdf() {
+// todo
+function exportToPdf() { /* ici aussi j'imagine qu'il va falloir changer puisque maintenant il y a plusieurs folder export en fonction de ce qui est selectionne dans la service sheet*/
     var equipmentNumber = getEquipmentNumber();
     var exportFolderId = EXPORT_FOLDER_ID;
-    var fileName = SPREADSHEET.sheets.serviceSheet.sheet.getRange(SPREADSHEET.sheets.serviceSheet.taskListNameCell).getValue();
+    var fileName = SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.taskListNameCell).getValue();
 
     var exportOptions = {
         exportFolderId: exportFolderId,
@@ -187,10 +204,11 @@ function exportToPdf() {
      exportPartsToDatabase();
 }
 
-function sendEmail(attachment) {
-    var recipient = SPREADSHEET.sheets.dataValidSheet.getRange("K21").getValue();
-    var subject = SPREADSHEET.sheets.dataValidSheet.getRange("K22").getValue();
-    var message = SPREADSHEET.sheets.dataValidSheet.getRange("K23").getValue();
+// todo
+function sendEmail(attachment) { /* Ici est ce qu'on pourrait rajouter une email addresse en copie? C'est l'addresse qui est dans l'onglet email automation B9*/
+    var recipient = SPREADSHEET.sheets.emailAutomation.getRange("B8").getValue();
+    var subject = SPREADSHEET.sheets.emailAutomation.getRange("B10").getValue();
+    var message = SPREADSHEET.sheets.emailAutomation.getRange("B11").getValue();
     var emailOptions = {
         attachments: [attachment.getAs(MimeType.PDF)],
         name: 'Automatic service sheet form mail sender'
