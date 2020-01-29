@@ -6,8 +6,9 @@ var DATABASE_SPREADSHEET = {
         partsFirstRow: '3'
 };
 
-function getDatabaseSheet() {
-    return SpreadsheetApp.openById(DATABASE_SPREADSHEET_ID).getSheetByName("Sheet1");
+function getStockUsageSheet() {
+    // TODO get from universal service sheet:references:B15
+    // return SpreadsheetApp.openById(DATABASE_SPREADSHEET_ID).getSheetByName("Sheet1");
 }
 
 /**
@@ -75,7 +76,7 @@ function getPartsInRepairMode() {
 }
 
 function sendPartsToDatabase(parts) {
-    var dbSheet = getDatabaseSheet();
+    var dbSheet = getStockUsageSheet();
     var firstEmptyRow = getDatabaseFirstEmptyRow();
     var  insertRange = dbSheet.getRange(
         firstEmptyRow,
@@ -86,7 +87,7 @@ function sendPartsToDatabase(parts) {
 }
 
 function getDatabaseFirstEmptyRow() {
-    var dbSheet = getDatabaseSheet();
+    var dbSheet = getStockUsageSheet();
     return Math.max(dbSheet.getLastRow(), DATABASE_SPREADSHEET.partsFirstRow) + 1;
 }
 
