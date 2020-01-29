@@ -18,7 +18,7 @@ function exportToPdf() { /* ici aussi j'imagine qu'il va falloir changer puisque
     };
     var pdfFile = ExportSpreadsheet.export(exportOptions);
     sendEmail(pdfFile);
-    exportPartsToDatabase();
+    exportPartsToStockUsageSheet();
     copyDataToServiceRegistry();
 }
 

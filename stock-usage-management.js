@@ -1,20 +1,23 @@
 var DATA_TYPE = 'Generator';
 
-var DATABASE_SPREADSHEET = {
-        partsFirstCol: ColumnNames.letterToColumn('A'),
-        partsLastCol: ColumnNames.letterToColumn('F'),
-        partsFirstRow: '3'
+var STOCK_USAGE_SPREADSHEET = {
+    partsFirstCol: ColumnNames.letterToColumn('A'),
+    partsLastCol: ColumnNames.letterToColumn('F'),
+    sheetName: 'Sheet1',
+    partsFirstRow: '3'
 };
 
 function getStockUsageSheet() {
-    // TODO get from universal service sheet:references:B15
-    // return SpreadsheetApp.openById(DATABASE_SPREADSHEET_ID).getSheetByName("Sheet1");
+    var spreadsheetUrl = SPREADSHEET.sheets.references.sheet.getRange(
+        SPREADSHEET.sheets.references.stockUsageSpreadsheetIdCell);
+    var spreadSheetId = spreadsheetUrlToId(spreadsheetUrl);
+    SpreadsheetApp.openById(getServiceRegisterSpreadsheetId()).getSheetByName(STOCK_USAGE_SPREADSHEET.sheetName);
 }
 
 /**
- * Export all parts in the database spreadsheet
+ * Export all parts in the 'stock usage' spreadsheet
  */
-function exportPartsToDatabase() {
+function exportPartsToStockUsageSheet() {
     var parts;
     if(serviceSheetIsServiceMode()) {
         parts = getPartsInServiceMode();
@@ -23,10 +26,10 @@ function exportPartsToDatabase() {
         parts = getPartsInRepairMode();
     }
     else  {
-        // Do not export data to the database in repair mode
+        // Do not export data to the 'stock usage' sheet in repair mode
         return;
     }
-    sendPartsToDatabase(parts);
+    sendPartsToStockUsageSheet(parts);
 }
 
 function getPartsInServiceMode() {
@@ -75,20 +78,20 @@ function getPartsInRepairMode() {
     return retVal;
 }
 
-function sendPartsToDatabase(parts) {
+function sendPartsToStockUsageSheet(parts) {
     var dbSheet = getStockUsageSheet();
-    var firstEmptyRow = getDatabaseFirstEmptyRow();
+    var firstEmptyRow = getStockUsageSheetFirstEmptyRow();
     var  insertRange = dbSheet.getRange(
         firstEmptyRow,
-        DATABASE_SPREADSHEET.partsFirstCol,
+        STOCK_USAGE_SPREADSHEET.partsFirstCol,
         parts.length,
-        DATABASE_SPREADSHEET.partsLastCol - DATABASE_SPREADSHEET.partsFirstCol + 1);
+        STOCK_USAGE_SPREADSHEET.partsLastCol - STOCK_USAGE_SPREADSHEET.partsFirstCol + 1);
     insertRange.setValues(parts);
 }
 
-function getDatabaseFirstEmptyRow() {
+function getStockUsageSheetFirstEmptyRow() {
     var dbSheet = getStockUsageSheet();
-    return Math.max(dbSheet.getLastRow(), DATABASE_SPREADSHEET.partsFirstRow) + 1;
+    return Math.max(dbSheet.getLastRow(), STOCK_USAGE_SPREADSHEET.partsFirstRow) + 1;
 }
 
 /**
