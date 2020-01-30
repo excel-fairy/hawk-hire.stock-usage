@@ -3,6 +3,8 @@ var SPREADSHEET = {
     sheets: {
         service:{
             sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Service sheet"),
+            equipmentOwnerCell: 'C5',
+            equipmentTypeCell: 'E5',
             equipmentNumberCell: 'E6',
             taskListNameCell: 'B14',
             taskTypeCell: 'C11',
@@ -123,7 +125,7 @@ function getTaskDate(){
  * @param equipmentType
  * @returns {{isExportSubfolders: *, ServiceRegisterCols: {serviceType: *, unitNo: *, engineHours: *, comments: *, serviceDate: *}, exportFolder1: *, serviceregisterSheetNamecol: *, equipmentOwner: *, serviceRegisterUrl: *, equipmentType: *, exportFolder2: *}}
  */
-function getreferences(equipmentOwner, equipmentType) {
+function getReferences(equipmentOwner, equipmentType) {
     var allReferences = SPREADSHEET.sheets.references.sheet.getRange(
         SPREADSHEET.sheets.references.referencesFirstRow,
         SPREADSHEET.sheets.references.referencesFirstCol,

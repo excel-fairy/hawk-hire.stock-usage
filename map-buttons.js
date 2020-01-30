@@ -4,7 +4,7 @@ function onOpen() {
     SpreadsheetApp.getUi()
         .createMenu('Run scripts')
         .addItem('Import Task List', 'importTaskList')
-        .addItem('Export Sheet and save in drive', 'exportToPdf')
+        .addItem('Export Sheet and save in drive', 'exportServiceSheet')
         .addItem('Authorize scripts to access Google drive from smartphone', 'createInstallableTriggers')
         .addToUi();
 }
@@ -29,7 +29,7 @@ function installableOnEdit(e){
         && range.getA1Notation() === SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.exportSheetButtonCell).getA1Notation()
         && range.getValue() === true){
         range.setValue(false);
-        exportToPdf();
+        exportServiceSheet();
     }
 }
 
