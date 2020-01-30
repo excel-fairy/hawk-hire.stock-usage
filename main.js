@@ -47,6 +47,10 @@ var SPREADSHEET = {
         },
         emailAutomation: {
             sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("email automation"),
+            recipientCell: 'B8',
+            copyRecipientCell: 'B9',
+            subjectCell: 'B10',
+            bodyCell: 'B11'
         },
         references: {
             sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("references"),

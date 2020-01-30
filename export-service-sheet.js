@@ -53,26 +53,35 @@ function savePdfToDrive(folderId) {
  * Send an email with the exported PDF as attachment
  * @param attachment The exported PDF
  */
-// todo
-function sendEmail(attachment) { /* Ici est ce qu'on pourrait rajouter une email addresse en copie? C'est l'addresse qui est dans l'onglet email automation B9*/
-    var recipient = SPREADSHEET.sheets.emailAutomation.getRange("B8").getValue();
-    var subject = SPREADSHEET.sheets.emailAutomation.getRange("B10").getValue();
-    var message = SPREADSHEET.sheets.emailAutomation.getRange("B11").getValue();
+function sendEmail(attachment) {
+    var copyRecipient = SPREADSHEET.sheets.emailAutomation
+        .getRange(SPREADSHEET.sheets.emailAutomation.copyRecipientCell).getValue();
+    var recipient = SPREADSHEET.sheets.emailAutomation
+        .getRange(SPREADSHEET.sheets.emailAutomation.recipientCell).getValue();
+    var subject = SPREADSHEET.sheets.emailAutomation
+        .getRange(SPREADSHEET.sheets.emailAutomation.subjectCell).getValue();
+    var message = SPREADSHEET.sheets.emailAutomation.getRange(SPREADSHEET.sheets.emailAutomation.bodyCell).getValue();
     var emailOptions = {
         attachments: [attachment.getAs(MimeType.PDF)],
-        name: 'Automatic service sheet form mail sender'
+        name: 'Automatic service sheet form mail sender',
+        cc: copyRecipient
     };
     MailApp.sendEmail(recipient, subject, message, emailOptions);
 }
 
-
+/**
+ * Get the ID of the folder to export the PDf file to
+ * @param baseFolderId The base export folder
+ * @param isExportSubfolders Should the PDF file be savec in a subfolder which name is the equipment number
+ * @param equipmentNumber The equipment number
+ * @returns {}
+ */
 function getFolderToExportPdfTo(baseFolderId, isExportSubfolders, equipmentNumber){
     var baseFolder = DriveApp.getFolderById(baseFolderId);
     if(!isExportSubfolders) {
         // PDF file should be exported straight in the base folder
         return baseFolder;
     } else {
-        // PDF file should be exported in a subfolder which name is the equipment number
         createExportFoldersIfNotExist(baseFolderId);
         var folders = baseFolder.getFolders();
         while (folders.hasNext()){
