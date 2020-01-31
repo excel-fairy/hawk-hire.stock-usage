@@ -11,7 +11,7 @@ function getStockUsageSheet() {
     var spreadsheetUrl = SPREADSHEET.sheets.references.sheet.getRange(
         SPREADSHEET.sheets.references.stockUsageSpreadsheetIdCell);
     var spreadSheetId = spreadsheetUrlToId(spreadsheetUrl);
-    SpreadsheetApp.openById(getServiceRegisterSpreadsheetId()).getSheetByName(STOCK_USAGE_SPREADSHEET.sheetName);
+    SpreadsheetApp.openById(spreadSheetId).getSheetByName(STOCK_USAGE_SPREADSHEET.sheetName);
 }
 
 /**
