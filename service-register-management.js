@@ -32,7 +32,7 @@ function copyDataToServiceRegistry(equipmentReferences){
         SERVICE_REGISTER_SPREADSHEET.servicesFirstRow,
         firstCol,
         serviceRegisterSheet.getLastRow() - SERVICE_REGISTER_SPREADSHEET.servicesFirstRow,
-        lasttCol - lasttCol + 1
+        lasttCol - firstCol + 1
     );
     var equipmentsNumbersValues = equipmentsNumbersRange.getValues();
     var equipmentNumber = getEquipmentNumber();
@@ -54,10 +54,11 @@ function copyDataToServiceRegistry(equipmentReferences){
                 values[0][serviceTypeCol - 1] = getTaskType();
             }
             if(serviceDateCol !== null) {
-                values[0][serviceDateCol] = getTaskDate();
+                values[0][serviceDateCol - 1] = getTaskDate();
             }
             if(nextServiceDueCol !== null) {
-                values[0][nextServiceDueCol - 1] = parseInt(getTaskType()) + nextServiceDueIncrement;
+                values[0][nextServiceDueCol - 1] = parseInt(getTaskType())
+                    + SERVICE_REGISTER_SPREADSHEET.nextServiceDueIncrement;
             }
         }
         if(commentsCol !== null) {

@@ -71,7 +71,7 @@ var SPREADSHEET = {
                 commentsStart0: ColumnNames.letterToColumnStart0('T')
             },
             referencesFirstCol: ColumnNames.letterToColumn('A'),
-            referencesLastCol: ColumnNames.letterToColumn('S'),
+            referencesLastCol: ColumnNames.letterToColumn('T'),
             referencesFirstRow: 3
         },
 
@@ -130,7 +130,8 @@ function getReferences(equipmentOwner, equipmentType) {
         SPREADSHEET.sheets.references.referencesFirstRow,
         SPREADSHEET.sheets.references.referencesFirstCol,
         SPREADSHEET.sheets.references.sheet.getLastRow(),
-        SPREADSHEET.sheets.references.referencesLastCol - SPREADSHEET.sheets.references.referencesFirstCol).getValues();
+        SPREADSHEET.sheets.references.referencesLastCol - SPREADSHEET.sheets.references.referencesFirstCol + 1)
+        .getValues();
 
     var equipmentOwnerColOffset = SPREADSHEET.sheets.references.equipmentOwnerColStart0;
     var equipmentTypeColOffset = SPREADSHEET.sheets.references.equipmentTypeColStart0;
@@ -152,11 +153,11 @@ function getReferences(equipmentOwner, equipmentType) {
         serviceregisterSheetName: referenceObj[SPREADSHEET.sheets.references.serviceregisterSheetNameColStart0],
         serviceRegisterCols: {
             unitNo: referenceObj[SPREADSHEET.sheets.references.serviceRegisterCols.unitNoStart0],
-            engineHours: referenceObj[SPREADSHEET.sheets.references.engineHoursStart0],
-            serviceType: referenceObj[SPREADSHEET.sheets.references.serviceTypeStart0],
-            serviceDate: referenceObj[SPREADSHEET.sheets.references.serviceDateStart0],
-            serviceDue: referenceObj[SPREADSHEET.sheets.references.serviceDueStart0],
-            comments: referenceObj[SPREADSHEET.sheets.references.commentsStart0],
+            engineHours: referenceObj[SPREADSHEET.sheets.references.serviceRegisterCols.engineHoursStart0],
+            serviceType: referenceObj[SPREADSHEET.sheets.references.serviceRegisterCols.serviceTypeStart0],
+            serviceDate: referenceObj[SPREADSHEET.sheets.references.serviceRegisterCols.serviceDateStart0],
+            serviceDue: referenceObj[SPREADSHEET.sheets.references.serviceRegisterCols.serviceDueStart0],
+            comments: referenceObj[SPREADSHEET.sheets.references.serviceRegisterCols.commentsStart0],
         }
     };
 }

@@ -25,8 +25,8 @@ function exportServiceSheet() {
     }
 
     // sendEmail(pdfFile);
-    exportPartsToStockUsageSheet();
-    // copyDataToServiceRegistry(equipmentReferences);
+    // exportPartsToStockUsageSheet();
+    copyDataToServiceRegistry(equipmentReferences);
 }
 
 /**
