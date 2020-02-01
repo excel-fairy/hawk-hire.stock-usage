@@ -24,8 +24,8 @@ function exportServiceSheet() {
         savePdfToDrive(exportFolder2Id);
     }
 
-    // sendEmail(pdfFile);
-    // exportPartsToStockUsageSheet();
+    sendEmail(pdfFile);
+    exportPartsToStockUsageSheet();
     copyDataToServiceRegistry(equipmentReferences);
 }
 
