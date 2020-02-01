@@ -67,7 +67,8 @@ var SPREADSHEET = {
                 engineHoursStart0: ColumnNames.letterToColumnStart0('P'),
                 serviceTypeStart0: ColumnNames.letterToColumnStart0('Q'),
                 serviceDateStart0: ColumnNames.letterToColumnStart0('R'),
-                commentsStart0: ColumnNames.letterToColumnStart0('S')
+                serviceDueStartColStart0: ColumnNames.letterToColumnStart0('S'),
+                commentsStart0: ColumnNames.letterToColumnStart0('T')
             },
             referencesFirstCol: ColumnNames.letterToColumn('A'),
             referencesLastFirstCol: ColumnNames.letterToColumn('S'),
@@ -112,12 +113,7 @@ function getMachineHours(){
     return SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.machineHoursCell).getValue();
 }
 function getTaskType(){
-    var type = SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.typeCell).getValue();
-    // todo
-    var hrSuffix = " hr"; /* Je pense que ca doit peut etre etre change ici puisque j'ai enleve le hr aux service types, c'est juste le nombre maintenant*/
-    if(type.substring(type.length - hrSuffix.length) === hrSuffix)
-        type = type.substring(0, type.length - hrSuffix.length);
-    return type;
+    return SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.typeCell).getValue();
 }
 function getTaskDate(){
     return SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.taskDateCell).getValue();
@@ -152,13 +148,14 @@ function getReferences(equipmentOwner, equipmentType) {
             ? folderUrlToId(referenceObj[exportFolder2ColStart0])
             : null,
         isExportSubfolders: referenceObj[isExportSubfoldersColStart0] === 'Y',
-        serviceRegisterUrl: spreadsheetUrlToId(referenceObj[serviceRegisterUrlColStart0]),
-        serviceregisterSheetNamecol: referenceObj[serviceregisterSheetNameColStart0],
-        ServiceRegisterCols: {
+        serviceRegisterId: spreadsheetUrlToId(referenceObj[serviceRegisterUrlColStart0]),
+        serviceregisterSheetName: referenceObj[serviceregisterSheetNameColStart0],
+        serviceRegisterCols: {
             unitNo: referenceObj[unitNoStartColStart0],
             engineHours: referenceObj[engineHoursStartColStart0],
             serviceType: referenceObj[serviceTypeStartColStart0],
             serviceDate: referenceObj[serviceDateStartColStart0],
+            serviceDue: referenceObj[serviceDueStartColStart0],
             comments: referenceObj[commentsStartColStart0],
         }
     };

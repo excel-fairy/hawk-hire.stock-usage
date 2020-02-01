@@ -1,44 +1,77 @@
 var SERVICE_REGISTER_SPREADSHEET = {
-    valuesRange: 'A3:AA47',
-    hoursColumnOffset: 2,
-    lastServiceCompletedColumnOffset: 3,
-    dateLastServiceCompletedColumnOffset: 4,
-    nextServiceDueColumnOffset: 5,
-    partsRequiredForNextService: 6
+    servicesFirstRow: 4,
+    nextServiceDueIncrement: 250
 };
 
-function getServiceRegisterSpreadsheetId() {
-    // TODO: dynamically get service register spreadsheet ID
-}
+/**
+ * Copy the service data to the service registry spreadsheet
+ * @param equipmentReferences
+ */
+function copyDataToServiceRegistry(equipmentReferences){
+    var serviceregisterSpreadSheetId = equipmentReferences.serviceRegisterId;
+    var serviceRegisterSpreadsheet = SpreadsheetApp.openById(serviceregisterSpreadSheetId);
+    var serviceRegisterSheet = serviceRegisterSpreadsheet.getSheetByName(equipmentReferences.serviceregisterSheetName);
 
-function copyDataToServiceRegistry(){
-    var serviceRegisterSpreadsheet = SpreadsheetApp.openById(getServiceRegisterSpreadsheetId());
-    var serviceRegisterSheet = serviceRegisterSpreadsheet.getActiveSheet();
-    var equipmentsNumbersRange = serviceRegisterSheet.getRange(SERVICE_REGISTER_SPREADSHEET.valuesRange);
+    var unitNoCol = ColumnNames.letterToColumn(equipmentReferences.serviceRegisterCols.unitNo) !== null
+        ? ColumnNames.letterToColumn(equipmentReferences.serviceRegisterCols.unitNo) : null;
+    var engineHoursCol = ColumnNames.letterToColumn(equipmentReferences.serviceRegisterCols.engineHours) !== null
+        ? ColumnNames.letterToColumn(equipmentReferences.serviceRegisterCols.engineHours) : null;
+    var serviceTypeCol = ColumnNames.letterToColumn(equipmentReferences.serviceRegisterCols.serviceType) !== null
+        ? ColumnNames.letterToColumn(equipmentReferences.serviceRegisterCols.serviceType) : null;
+    var serviceDateCol = ColumnNames.letterToColumn(equipmentReferences.serviceRegisterCols.serviceDate) !== null
+        ? ColumnNames.letterToColumn(equipmentReferences.serviceRegisterCols.serviceDate) : null;
+    var nextServiceDueCol = ColumnNames.letterToColumn(equipmentReferences.serviceRegisterCols.serviceDue) !== null
+        ? ColumnNames.letterToColumn(equipmentReferences.serviceRegisterCols.serviceDue) : null;
+    var commentsCol = ColumnNames.letterToColumn(equipmentReferences.serviceRegisterCols.comments) !== null
+        ? ColumnNames.letterToColumn(equipmentReferences.serviceRegisterCols.comments) : null;
+
+    var firstCol = unitNoCol;
+    var lasttCol = commentsCol;
+
+    var equipmentsNumbersRange = serviceRegisterSheet.getRange(
+        SERVICE_REGISTER_SPREADSHEET.servicesFirstRow,
+        firstCol,
+        serviceRegisterSheet.getLastRow() - SERVICE_REGISTER_SPREADSHEET.servicesFirstRow,
+        lasttCol - lasttCol + 1
+    );
     var equipmentsNumbersValues = equipmentsNumbersRange.getValues();
     var equipmentNumber = getEquipmentNumber();
 
     var equipmentRow = null;
-    // Iterate through equipments in the service register and stop when
+    // Iterate through equipments in the service register and stop when the row of the right equipment is found
     for(var i=0; i < equipmentsNumbersValues.length; i++){
-        if(equipmentsNumbersValues[i][0] === equipmentNumber)
+        if(equipmentsNumbersValues[i][unitNoCol - 1] === equipmentNumber)
             equipmentRow = equipmentsNumbersRange.offset(i, 0, 1);
     }
     if(equipmentRow !== null) {
         // The current equipment has been found in the service register
         var values = equipmentRow.getValues();
         if(serviceSheetIsServiceMode()){
-            values[0][SERVICE_REGISTER_SPREADSHEET.hoursColumnOffset] = getMachineHours();
-            values[0][SERVICE_REGISTER_SPREADSHEET.lastServiceCompletedColumnOffset] = getTaskType();
-            values[0][SERVICE_REGISTER_SPREADSHEET.dateLastServiceCompletedColumnOffset] = getTaskDate();
-            values[0][SERVICE_REGISTER_SPREADSHEET.nextServiceDueColumnOffset] = parseInt(getTaskType()) + 250;
+            if(engineHoursCol !== null) {
+                values[0][engineHoursCol - 1] = getMachineHours();
+            }
+            if(serviceTypeCol !== null) {
+                values[0][serviceTypeCol - 1] = getTaskType();
+            }
+            if(serviceDateCol !== null) {
+                values[0][serviceDateCol] = getTaskDate();
+            }
+            if(nextServiceDueCol !== null) {
+                values[0][nextServiceDueCol - 1] = parseInt(getTaskType()) + nextServiceDueIncrement;
+            }
         }
-        values[0][SERVICE_REGISTER_SPREADSHEET.partsRequiredForNextService] = getComments();
+        if(commentsCol !== null) {
+            values[0][commentsCol - 1] = getComments();
+        }
 
         equipmentRow.setValues(values);
     }
 }
 
+/**
+ * Get the comments of the service
+ * @returns {string} The comments
+ */
 function getComments(){
     var i;
     var firstRowOffset, nbRows;

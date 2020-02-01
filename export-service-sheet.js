@@ -13,7 +13,7 @@ function exportServiceSheet() {
 
     var equipmentNumber = getEquipmentNumber();
     var exportFolder1Id = getFolderToExportPdfTo(equipmentReferences.exportFolder1,
-        isExportSubfolders, equipmentNumber).getId();
+        equipmentReferences.isExportSubfolders, equipmentNumber).getId();
     var exportFolder2Id = getFolderToExportPdfTo(equipmentReferences.exportFolder2,
         equipmentReferences.isExportSubfolders, equipmentNumber).getId();
 
@@ -25,7 +25,7 @@ function exportServiceSheet() {
 
     sendEmail(pdfFile);
     exportPartsToStockUsageSheet();
-    copyDataToServiceRegistry();
+    copyDataToServiceRegistry(equipmentReferences);
 }
 
 /**
