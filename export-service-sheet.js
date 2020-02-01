@@ -7,25 +7,26 @@
  * - Stock usage spreadsheet
  */
 function exportServiceSheet() {
-    var equipmentOwner = SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.equipmentOwnerCell);
-    var equipmentType = SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.equipmentTypeCell);
+    var equipmentOwner = SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.equipmentOwnerCell)
+        .getValue();
+    var equipmentType = SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.equipmentTypeCell)
+        .getValue();
     var equipmentReferences = getReferences(equipmentOwner, equipmentType);
 
     var equipmentNumber = getEquipmentNumber();
     var exportFolder1Id = getFolderToExportPdfTo(equipmentReferences.exportFolder1,
         equipmentReferences.isExportSubfolders, equipmentNumber).getId();
-    var exportFolder2Id = getFolderToExportPdfTo(equipmentReferences.exportFolder2,
-        equipmentReferences.isExportSubfolders, equipmentNumber).getId();
-
     var pdfFile = savePdfToDrive(exportFolder1Id);
 
-    if(exportFolder2Id != null) {
-        savePdfToDrive(exportFolder1Id);
+    if(equipmentReferences.exportFolder2 !== null) {
+        var exportFolder2Id = getFolderToExportPdfTo(equipmentReferences.exportFolder2,
+            equipmentReferences.isExportSubfolders, equipmentNumber).getId();
+        savePdfToDrive(exportFolder2Id);
     }
 
-    sendEmail(pdfFile);
-    exportPartsToStockUsageSheet();
-    copyDataToServiceRegistry(equipmentReferences);
+    // sendEmail(pdfFile);
+    // exportPartsToStockUsageSheet();
+    // copyDataToServiceRegistry(equipmentReferences);
 }
 
 /**
@@ -37,6 +38,8 @@ function savePdfToDrive(folderId) {
     var exportOptions = {
         exportFolderId: folderId,
         exportFileName: fileName,
+        spreadsheetId: SPREADSHEET.spreadSheet.getId(),
+        sheetId: SPREADSHEET.sheets.service.sheet.getSheetId(),
         range: {
             r1: SPREADSHEET.sheets.service.taskListCoordinates.fullDocumentBeginningRow - 1,
             r2: SPREADSHEET.sheets.service.taskListCoordinates.row + getNbTasks(),
@@ -72,7 +75,7 @@ function sendEmail(attachment) {
 /**
  * Get the ID of the folder to export the PDf file to
  * @param baseFolderId The base export folder
- * @param isExportSubfolders Should the PDF file be savec in a subfolder which name is the equipment number
+ * @param isExportSubfolders Should the PDF file be saved in a subfolder which name is the equipment number
  * @param equipmentNumber The equipment number
  * @returns {}
  */
@@ -82,7 +85,7 @@ function getFolderToExportPdfTo(baseFolderId, isExportSubfolders, equipmentNumbe
         // PDF file should be exported straight in the base folder
         return baseFolder;
     } else {
-        createExportFoldersIfNotExist(baseFolderId);
+        createExportSubFoldersIfNotExist(baseFolderId);
         var folders = baseFolder.getFolders();
         while (folders.hasNext()){
             var folder = folders.next();
@@ -97,7 +100,12 @@ function getFolderToExportPdfTo(baseFolderId, isExportSubfolders, equipmentNumbe
     }
 }
 
-function createExportFoldersIfNotExist(baseFolderId){
+/**
+ * Create subfolders in the base folder. One subfolder will be created per equipment. The names of the subfolders are
+ * the quipments numbers
+ * @param baseFolderId The ID of the base folder
+ */
+function createExportSubFoldersIfNotExist(baseFolderId){
     var range = SPREADSHEET.sheets.dataValidation.sheet.getRange(SPREADSHEET.sheets.dataValidation.equipmentsRange);
     var values = range.getDisplayValues();
     var baseFolder = DriveApp.getFolderById(baseFolderId);

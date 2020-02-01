@@ -41,7 +41,7 @@ var SPREADSHEET = {
         },
         dataValidation: {
             sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("data validation"),
-            equipmentsRange: 'B3:B36',
+            equipmentsRange: 'J3:J60',
             yesCell: "A2",
             noCell: "A3"
         },
@@ -67,11 +67,11 @@ var SPREADSHEET = {
                 engineHoursStart0: ColumnNames.letterToColumnStart0('P'),
                 serviceTypeStart0: ColumnNames.letterToColumnStart0('Q'),
                 serviceDateStart0: ColumnNames.letterToColumnStart0('R'),
-                serviceDueStartColStart0: ColumnNames.letterToColumnStart0('S'),
+                serviceDueStart0: ColumnNames.letterToColumnStart0('S'),
                 commentsStart0: ColumnNames.letterToColumnStart0('T')
             },
             referencesFirstCol: ColumnNames.letterToColumn('A'),
-            referencesLastFirstCol: ColumnNames.letterToColumn('S'),
+            referencesLastCol: ColumnNames.letterToColumn('S'),
             referencesFirstRow: 3
         },
 
@@ -123,40 +123,40 @@ function getTaskDate(){
  *
  * @param equipmentOwner
  * @param equipmentType
- * @returns {{isExportSubfolders: *, ServiceRegisterCols: {serviceType: *, unitNo: *, engineHours: *, comments: *, serviceDate: *}, exportFolder1: *, serviceregisterSheetNamecol: *, equipmentOwner: *, serviceRegisterUrl: *, equipmentType: *, exportFolder2: *}}
+ * @returns {{isExportSubfolders: boolean, serviceRegisterId: *, exportFolder1: *, serviceregisterSheetName: *, equipmentOwner: *, serviceRegisterCols: {serviceType: *, unitNo: *, engineHours: *, comments: *, serviceDate: *, serviceDue: *}, equipmentType: *, exportFolder2: (*|null)}}
  */
 function getReferences(equipmentOwner, equipmentType) {
     var allReferences = SPREADSHEET.sheets.references.sheet.getRange(
         SPREADSHEET.sheets.references.referencesFirstRow,
         SPREADSHEET.sheets.references.referencesFirstCol,
         SPREADSHEET.sheets.references.sheet.getLastRow(),
-        SPREADSHEET.sheets.references.referencesLastCol - SPREADSHEET.sheets.references.referencesFirstCol);
+        SPREADSHEET.sheets.references.referencesLastCol - SPREADSHEET.sheets.references.referencesFirstCol).getValues();
 
     var equipmentOwnerColOffset = SPREADSHEET.sheets.references.equipmentOwnerColStart0;
     var equipmentTypeColOffset = SPREADSHEET.sheets.references.equipmentTypeColStart0;
     // We know this array has exactly one element
     var referenceArray = allReferences.filter(function (reference) {
         return equipmentOwner === reference[equipmentOwnerColOffset]
-            && equipmentType === reference[equipmentType];
+            && equipmentType === reference[equipmentTypeColOffset];
     });
     var referenceObj = referenceArray[0];
     return {
-        equipmentOwner: referenceObj[equipmentOwnerColStart0],
-        equipmentType: referenceObj[equipmentTypeColStart0],
-        exportFolder1: folderUrlToId(referenceObj[exportFolder1ColStart0]),
-        exportFolder2: referenceObj[exportFolder2ColStart0] !== 'N/A'
-            ? folderUrlToId(referenceObj[exportFolder2ColStart0])
+        equipmentOwner: referenceObj[equipmentOwnerColOffset],
+        equipmentType: referenceObj[equipmentTypeColOffset],
+        exportFolder1: folderUrlToId(referenceObj[SPREADSHEET.sheets.references.exportFolder1ColStart0]),
+        exportFolder2: referenceObj[SPREADSHEET.sheets.references.exportFolder2ColStart0] !== 'N/A'
+            ? folderUrlToId(referenceObj[SPREADSHEET.sheets.references.exportFolder2ColStart0])
             : null,
-        isExportSubfolders: referenceObj[isExportSubfoldersColStart0] === 'Y',
-        serviceRegisterId: spreadsheetUrlToId(referenceObj[serviceRegisterUrlColStart0]),
-        serviceregisterSheetName: referenceObj[serviceregisterSheetNameColStart0],
+        isExportSubfolders: referenceObj[SPREADSHEET.sheets.references.isExportSubfoldersColStart0] === 'Y',
+        serviceRegisterId: spreadsheetUrlToId(referenceObj[SPREADSHEET.sheets.references.serviceRegisterUrlColStart0]),
+        serviceregisterSheetName: referenceObj[SPREADSHEET.sheets.references.serviceregisterSheetNameColStart0],
         serviceRegisterCols: {
-            unitNo: referenceObj[unitNoStartColStart0],
-            engineHours: referenceObj[engineHoursStartColStart0],
-            serviceType: referenceObj[serviceTypeStartColStart0],
-            serviceDate: referenceObj[serviceDateStartColStart0],
-            serviceDue: referenceObj[serviceDueStartColStart0],
-            comments: referenceObj[commentsStartColStart0],
+            unitNo: referenceObj[SPREADSHEET.sheets.references.serviceRegisterCols.unitNoStart0],
+            engineHours: referenceObj[SPREADSHEET.sheets.references.engineHoursStart0],
+            serviceType: referenceObj[SPREADSHEET.sheets.references.serviceTypeStart0],
+            serviceDate: referenceObj[SPREADSHEET.sheets.references.serviceDateStart0],
+            serviceDue: referenceObj[SPREADSHEET.sheets.references.serviceDueStart0],
+            comments: referenceObj[SPREADSHEET.sheets.references.commentsStart0],
         }
     };
 }
