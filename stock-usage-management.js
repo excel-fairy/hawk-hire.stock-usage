@@ -9,9 +9,9 @@ var STOCK_USAGE_SPREADSHEET = {
 
 function getStockUsageSheet() {
     var spreadsheetUrl = SPREADSHEET.sheets.references.sheet.getRange(
-        SPREADSHEET.sheets.references.stockUsageSpreadsheetIdCell);
+        SPREADSHEET.sheets.references.stockUsageSpreadsheetIdCell).getValue();
     var spreadSheetId = spreadsheetUrlToId(spreadsheetUrl);
-    SpreadsheetApp.openById(spreadSheetId).getSheetByName(STOCK_USAGE_SPREADSHEET.sheetName);
+    return SpreadsheetApp.openById(spreadSheetId).getSheetByName(STOCK_USAGE_SPREADSHEET.sheetName);
 }
 
 /**

@@ -54,7 +54,7 @@ var SPREADSHEET = {
         },
         references: {
             sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("references"),
-            stockUsageSpreadsheetIdCell: 'AE6',
+            stockUsageSpreadsheetIdCell: 'B15',
             equipmentOwnerColStart0: ColumnNames.letterToColumnStart0('A'),
             equipmentTypeColStart0: ColumnNames.letterToColumnStart0('B'),
             exportFolder1ColStart0: ColumnNames.letterToColumnStart0('D'),

@@ -6,7 +6,7 @@
 function folderUrlToId(url) {
     var regex = /^https:\/\/drive\.google\.com\/drive\/folders\/(.*)$/g;
     var match = regex.exec(url);
-    // No idea why this is required. If not set, variable "match" will be null in the return line ...
+    // No idea why this is required. If not set, variable "match" will sometimes be null in the return line ...
     regex.exec(url);
     return match[1];
 }
@@ -19,5 +19,7 @@ function folderUrlToId(url) {
 function spreadsheetUrlToId(url) {
     var regex = /^https:\/\/docs\.google\.com\/spreadsheets\/d\/(.*?)(\/edit#gid=.*)?$/g;
     var match = regex.exec(url);
+    // No idea why this is required. If not set, variable "match" will sometimes be null in the return line ...
+    regex.exec(url);
     return match[1];
 }

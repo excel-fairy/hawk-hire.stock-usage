@@ -25,7 +25,7 @@ function exportServiceSheet() {
     }
 
     // sendEmail(pdfFile);
-    // exportPartsToStockUsageSheet();
+    exportPartsToStockUsageSheet();
     // copyDataToServiceRegistry(equipmentReferences);
 }
 
@@ -57,13 +57,13 @@ function savePdfToDrive(folderId) {
  * @param attachment The exported PDF
  */
 function sendEmail(attachment) {
-    var copyRecipient = SPREADSHEET.sheets.emailAutomation
+    var copyRecipient = SPREADSHEET.sheets.emailAutomation.sheet
         .getRange(SPREADSHEET.sheets.emailAutomation.copyRecipientCell).getValue();
-    var recipient = SPREADSHEET.sheets.emailAutomation
+    var recipient = SPREADSHEET.sheets.emailAutomation.sheet
         .getRange(SPREADSHEET.sheets.emailAutomation.recipientCell).getValue();
-    var subject = SPREADSHEET.sheets.emailAutomation
+    var subject = SPREADSHEET.sheets.emailAutomation.sheet
         .getRange(SPREADSHEET.sheets.emailAutomation.subjectCell).getValue();
-    var message = SPREADSHEET.sheets.emailAutomation.getRange(SPREADSHEET.sheets.emailAutomation.bodyCell).getValue();
+    var message = SPREADSHEET.sheets.emailAutomation.sheet.getRange(SPREADSHEET.sheets.emailAutomation.bodyCell).getValue();
     var emailOptions = {
         attachments: [attachment.getAs(MimeType.PDF)],
         name: 'Automatic service sheet form mail sender',
