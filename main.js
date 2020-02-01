@@ -29,21 +29,21 @@ var SPREADSHEET = {
                 nbCols: 4
             }
         },
-        servicePerType: {
-            sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Service per type"),
-            rowsInTaskListCell: 'E1',
-            commentCellRowCell: 'F1',
-            sourceDataRange: 'B2:E70'
-        },
         serviceTaskList: {
             sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("service task list"),
-            rowsInTaskListCell: 'AE6',
-            commentCellRowCell: 'AE6',
-            sourceDataRange: 'AC7:AC80'
+            rowsInTaskListCell: 'AH6',
+            commentCellRowCell: 'AH6',
+            sourceDataRange: 'AC7:AF80',
+            startRange1Cell: "AK7",
+            endRange1Cell: "AK8",
+            startRange2Cell: "AK9",
+            endRange2Cell: "AK10"
         },
         dataValidation: {
             sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("data validation"),
-            equipmentsRange: 'B3:B36'
+            equipmentsRange: 'B3:B36',
+            yesCell: "A2",
+            noCell: "A3"
         },
         emailAutomation: {
             sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("email automation"),
