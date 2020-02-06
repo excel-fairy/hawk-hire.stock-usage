@@ -51,7 +51,10 @@ function getPartsInServiceMode() {
     var task = serviceSheet.getRange(SPREADSHEET.sheets.service.taskTypeCell).getValue();
 
     var transformedReplaceParts = replaceParts.map(function (e) {
-        return [date, equipmentNo, type, task, e[0], 1];
+        var partNoAndPartAmount = getReplacePartNo(e[0]);
+        var partNo = partNoAndPartAmount.partNo;
+        var partAmount = partNoAndPartAmount.partAmount;
+        return [date, equipmentNo, type, task, partNo, partAmount];
     });
 
     var transformeAdditionalParts = additionalParts.map(function (e) {
@@ -59,6 +62,38 @@ function getPartsInServiceMode() {
     });
 
     return transformedReplaceParts.concat(transformeAdditionalParts);
+}
+
+
+/**
+ * Extract the part number and amount of parts used from the replace "Part no" section
+ * @param replacePartNo The combined part number and amount. It has the followinf formatting:
+ * "[part no] x [amount of parts]"
+ * @returns {{partAmount: *, partNo: *}} An object containing the part number and the amount of parts used
+ */
+function getReplacePartNo(replacePartNo) {
+    var partNoRegex = /^(.*?) +x +(.*)$/
+    var match = partNoRegex.exec(replacePartNo);
+    // No idea why this is required. If not set, variable "match" will sometimes be null in the return line ...
+    partNoRegex.exec(replacePartNo);
+
+    var partNo = null;
+    var partAmount = null;
+    if(match !== null && match.length === 3) {
+        // Both part no and part amount found
+        partNo = match[1];
+        partAmount = match[2]
+    } else if(match == null) {
+        // Separator not found. Assuming whole string is the part no
+        partNo = 1;
+        partAmount = replacePartNo
+    } else {
+        return null;
+    }
+    return {
+        partNo: partNo,
+        partAmount: partAmount
+    }
 }
 
 function getPartsInRepairMode() {
