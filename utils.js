@@ -8,7 +8,7 @@ function folderUrlToId(url) {
     var match = regex.exec(url);
     // No idea why this is required. If not set, variable "match" will sometimes be null in the return line ...
     regex.exec(url);
-    return match[1];
+    return match === null ? null : match[1];
 }
 
 /**
@@ -21,5 +21,5 @@ function spreadsheetUrlToId(url) {
     var match = regex.exec(url);
     // No idea why this is required. If not set, variable "match" will sometimes be null in the return line ...
     regex.exec(url);
-    return match[1];
+    return match === null ? null : match[1];
 }

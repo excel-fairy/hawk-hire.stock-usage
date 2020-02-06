@@ -16,17 +16,19 @@ function exportServiceSheet() {
     var equipmentNumber = getEquipmentNumber();
     var exportFolder1Id = getFolderToExportPdfTo(equipmentReferences.exportFolder1,
         equipmentReferences.isExportSubfolders, equipmentNumber).getId();
-    var pdfFile = savePdfToDrive(exportFolder1Id);
+    if(equipmentReferences.exportFolder1 !== null) {
+        var pdfFile = savePdfToDrive(exportFolder1Id);
 
-    if(equipmentReferences.exportFolder2 !== null) {
-        var exportFolder2Id = getFolderToExportPdfTo(equipmentReferences.exportFolder2,
-            equipmentReferences.isExportSubfolders, equipmentNumber).getId();
-        savePdfToDrive(exportFolder2Id);
+        if(equipmentReferences.exportFolder2 !== null) {
+            var exportFolder2Id = getFolderToExportPdfTo(equipmentReferences.exportFolder2,
+                equipmentReferences.isExportSubfolders, equipmentNumber).getId();
+            savePdfToDrive(exportFolder2Id);
+        }
+
+        sendEmail(pdfFile);
+        exportPartsToStockUsageSheet();
+        copyDataToServiceRegistry(equipmentReferences);
     }
-
-    sendEmail(pdfFile);
-    exportPartsToStockUsageSheet();
-    copyDataToServiceRegistry(equipmentReferences);
 }
 
 /**

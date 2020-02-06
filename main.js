@@ -106,6 +106,10 @@ function getTask(){
     return SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.taskTypeCell).getValue();
 }
 
+function getEquipmentType(){
+    return SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.equipmentTypeCell).getValue();
+}
+
 function getEquipmentNumber(){
     return SPREADSHEET.sheets.service.sheet.getRange(SPREADSHEET.sheets.service.equipmentNumberCell).getValue();
 }

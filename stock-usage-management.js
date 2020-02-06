@@ -1,5 +1,3 @@
-var DATA_TYPE = 'Generator';
-
 var STOCK_USAGE_SPREADSHEET = {
     partsFirstCol: ColumnNames.letterToColumn('A'),
     partsLastCol: ColumnNames.letterToColumn('F'),
@@ -11,7 +9,11 @@ function getStockUsageSheet() {
     var spreadsheetUrl = SPREADSHEET.sheets.references.sheet.getRange(
         SPREADSHEET.sheets.references.stockUsageSpreadsheetIdCell).getValue();
     var spreadSheetId = spreadsheetUrlToId(spreadsheetUrl);
-    return SpreadsheetApp.openById(spreadSheetId).getSheetByName(STOCK_USAGE_SPREADSHEET.sheetName);
+    if(spreadSheetId != null) {
+        return SpreadsheetApp.openById(spreadSheetId).getSheetByName(STOCK_USAGE_SPREADSHEET.sheetName);
+    } else {
+        return null;
+    }
 }
 
 /**
@@ -47,14 +49,14 @@ function getPartsInServiceMode() {
     var serviceSheet = SPREADSHEET.sheets.service.sheet;
     var date = serviceSheet.getRange(SPREADSHEET.sheets.service.taskDateCell).getValue();
     var equipmentNo = serviceSheet.getRange(SPREADSHEET.sheets.service.equipmentNumberCell).getValue();
-    var type = DATA_TYPE;
+    var type = getEquipmentType();
     var task = serviceSheet.getRange(SPREADSHEET.sheets.service.taskTypeCell).getValue();
 
     var transformedReplaceParts = replaceParts.map(function (e) {
         var partNoAndPartAmount = getReplacePartNo(e[0]);
         var partNo = partNoAndPartAmount.partNo;
         var partAmount = partNoAndPartAmount.partAmount;
-        return [date, equipmentNo, type, task, partNo, partAmount];
+        return [date, equipmentNo, type, task, partAmount, partNo];
     });
 
     var transformeAdditionalParts = additionalParts.map(function (e) {
@@ -104,7 +106,7 @@ function getPartsInRepairMode() {
     var serviceSheet = SPREADSHEET.sheets.service.sheet;
     var date = serviceSheet.getRange(SPREADSHEET.sheets.service.taskDateCell).getValue();
     var equipmentNo = serviceSheet.getRange(SPREADSHEET.sheets.service.equipmentNumberCell).getValue();
-    var type = DATA_TYPE;
+    var type = getEquipmentType();
     var task = serviceSheet.getRange(SPREADSHEET.sheets.service.taskTypeCell).getValue();
 
     var retVal = filteredParts.map(function (e) {
@@ -115,13 +117,15 @@ function getPartsInRepairMode() {
 
 function sendPartsToStockUsageSheet(parts) {
     var dbSheet = getStockUsageSheet();
-    var firstEmptyRow = getStockUsageSheetFirstEmptyRow();
-    var  insertRange = dbSheet.getRange(
-        firstEmptyRow,
-        STOCK_USAGE_SPREADSHEET.partsFirstCol,
-        parts.length,
-        STOCK_USAGE_SPREADSHEET.partsLastCol - STOCK_USAGE_SPREADSHEET.partsFirstCol + 1);
-    insertRange.setValues(parts);
+    if(dbSheet != null) {
+        var firstEmptyRow = getStockUsageSheetFirstEmptyRow();
+        var  insertRange = dbSheet.getRange(
+            firstEmptyRow,
+            STOCK_USAGE_SPREADSHEET.partsFirstCol,
+            parts.length,
+            STOCK_USAGE_SPREADSHEET.partsLastCol - STOCK_USAGE_SPREADSHEET.partsFirstCol + 1);
+        insertRange.setValues(parts);
+    }
 }
 
 function getStockUsageSheetFirstEmptyRow() {
