@@ -27,6 +27,10 @@ var SPREADSHEET = {
                 row: 15,
                 col: 2,
                 nbCols: 4
+            },
+            specialPartsCellsContents: {
+                clientSuppliedParts: 'Client Supplied Parts',
+                totalNumberHoursOfJob: 'Total number of hours of the job:'
             }
         },
         serviceTaskList: {

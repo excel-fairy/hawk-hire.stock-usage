@@ -23,7 +23,7 @@ function importTaskList() {
     var taskRange = getTasksListRange(nbTasks);
     taskRange.setBorder(true, true, true, true, false, false);
     highlightHeaderCells(taskRange);
-    boldCells(taskRange);
+    boldSpecialCells(taskRange);
 
     if (serviceSheetIsRepairMode() || serviceSheetIsInspectionMode()){
         var commentCellRow = SPREADSHEET.sheets.serviceTaskList.sheet.getRange(SPREADSHEET.sheets.serviceTaskList.commentCellRowCell).getValue();
@@ -74,8 +74,9 @@ function highlightHeaderCells(range){
     }
 }
 
-function boldCells(range){
-    var cellsContent = ['Client Supplied Parts', 'Total number of hours of the job:'];
+function boldSpecialCells(range){
+    var cellsContent = [SPREADSHEET.sheets.service.specialPartsCellsContents.clientSuppliedParts,
+        SPREADSHEET.sheets.service.specialPartsCellsContents.totalNumberHoursOfJob];
     applyStyle(range, cellsContent, applyStyleOnCell);
 
     function applyStyleOnCell(cell) {
