@@ -34,16 +34,19 @@ var SPREADSHEET = {
             rowsInTaskListCell: 'AH6',
             commentCellRowCell: 'AH6',
             sourceDataRange: 'AC7:AF80',
-            startRange1Cell: "AK7",
-            endRange1Cell: "AK8",
-            startRange2Cell: "AK9",
-            endRange2Cell: "AK10"
+            numberValidationStartRange: "AK7",
+            numberValidationEndRange: "AK8",
+            yesNoValidationStartRange: "AK9",
+            yesNoValidationEndRange: "AK10",
+            clientPartValidationRange1: "AK12",
+            clientPartValidationRange2: "AK13",
         },
         dataValidation: {
             sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("data validation"),
             equipmentsRange: 'J3:J60',
             yesCell: "A2",
-            noCell: "A3"
+            noCell: "A3",
+            numbersrange: "L1:L500"
         },
         emailAutomation: {
             sheet: SpreadsheetApp.getActiveSpreadsheet().getSheetByName("email automation"),
