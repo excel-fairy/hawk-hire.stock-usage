@@ -39,7 +39,7 @@ function getPartsInServiceMode() {
     var stopKey = 'Comments';
     var firstPartsRow = SPREADSHEET.sheets.service.serviceMode.firstEntryRow;
     var nonFilteredParts = getPartsWithQuantityNonFiltered(firstPartsRow);
-    var filteredParts = nonFilteredParts.filter(function (e) { return e[0] !== '' });
+    var filteredParts = filterPartsForExport(nonFilteredParts);
 
     var beforeAdditionalPartsIndex = getIndexOfKeyIn2DArray(filteredParts, beforeAdditionalPartsKey);
     var stopIndex = getIndexOfKeyIn2DArray(filteredParts, stopKey);
@@ -53,20 +53,25 @@ function getPartsInServiceMode() {
     var task = serviceSheet.getRange(SPREADSHEET.sheets.service.taskTypeCell).getValue();
 
     var transformedReplaceParts = replaceParts.map(function (e) {
-        return [date, equipmentNo, type, task, e[0], e[1]];
+        return [date, equipmentNo, type, task, e[2], e[3]];
     });
 
     var transformeAdditionalParts = additionalParts.map(function (e) {
-        return [date, equipmentNo, type, task, e[0], e[1]];
+        return [date, equipmentNo, type, task, e[2], e[3]];
     });
 
-    return transformedReplaceParts.concat(transformeAdditionalParts);
+    var nbHours = getTotalNumberOfHoursOfTheJob(nonFilteredParts);
+    var totalNumberOfHours = [date, equipmentNo, type, task, 'Labour', nbHours];
+
+    var retVal = transformedReplaceParts.concat(transformeAdditionalParts);
+    retVal.push(totalNumberOfHours);
+    return retVal;
 }
 
 function getPartsInRepairMode() {
     var firstPartsRow = SPREADSHEET.sheets.service.repairMode.firstEntryRow;
     var nonFilteredParts = getPartsWithQuantityNonFiltered(firstPartsRow);
-    var filteredParts = nonFilteredParts.filter(function (e) { return e[0] !== '' });
+    var filteredParts = filterPartsForExport(nonFilteredParts);
 
     var serviceSheet = SPREADSHEET.sheets.service.sheet;
     var date = serviceSheet.getRange(SPREADSHEET.sheets.service.taskDateCell).getValue();
@@ -74,9 +79,32 @@ function getPartsInRepairMode() {
     var type = getEquipmentType();
     var task = serviceSheet.getRange(SPREADSHEET.sheets.service.taskTypeCell).getValue();
 
-    return filteredParts.map(function (e) {
-        return [date, equipmentNo, type, task, e[0], e[1]];
+    var retVal = filteredParts.map(function (e) {
+        return [date, equipmentNo, type, task, e[2], e[3]];
     });
+
+    var nbHours = getTotalNumberOfHoursOfTheJob(nonFilteredParts);
+    var totalNumberOfHours = [date, equipmentNo, type, task, 'Labour', nbHours];
+
+    retVal.push(totalNumberOfHours);
+    return retVal;
+}
+
+function filterPartsForExport(parts) {
+    return parts.filter(function (e) {
+        // Row is an actual parts row, not a special row
+        return e[0] !== SPREADSHEET.sheets.service.specialPartsCellsContents.clientSuppliedParts
+            && e[0] !== SPREADSHEET.sheets.service.specialPartsCellsContents.totalNumberHoursOfJob
+            // Part has a name
+            && e[2] !== '';
+    });
+}
+
+function getTotalNumberOfHoursOfTheJob(parts) {
+    var totalNumberOfHoursRow = parts.filter(function (e) {
+        return e[0] === SPREADSHEET.sheets.service.specialPartsCellsContents.totalNumberHoursOfJob;
+    })[0]; // We know there is exactly one row that matches the filter
+    return totalNumberOfHoursRow[3];
 }
 
 function sendPartsToStockUsageSheet(parts) {
@@ -106,9 +134,9 @@ function getStockUsageSheetFirstEmptyRow() {
 function getPartsWithQuantityNonFiltered(firstrow) {
     var range = SPREADSHEET.sheets.service.sheet.getRange(
         firstrow,
-        SPREADSHEET.sheets.service.partsCol,
+        SPREADSHEET.sheets.service.typeCol,
         SPREADSHEET.sheets.service.sheet.getLastRow() + firstrow + 1,
-        SPREADSHEET.sheets.service.quantityCol - SPREADSHEET.sheets.service.partsCol + 1);
+        SPREADSHEET.sheets.service.quantityCol - SPREADSHEET.sheets.service.typeCol + 1);
     return range.getValues();
 }
 
@@ -117,7 +145,7 @@ function getPartsWithQuantityNonFiltered(firstrow) {
  */
 function getIndexOfKeyIn2DArray(array, key) {
     for (var i = 0; i < array.length; i++) {
-        if (array[i][0] === key) {
+        if (array[i][2] === key) {
             return i;
         }
     }

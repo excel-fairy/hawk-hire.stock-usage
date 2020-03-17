@@ -14,6 +14,7 @@ var SPREADSHEET = {
             taskDateCell: 'C6',
             importTaskListButtonCell: 'J5',
             exportSheetButtonCell: 'J10',
+            typeCol: ColumnNames.letterToColumn('B'),
             partsCol: ColumnNames.letterToColumn('D'),
             quantityCol: ColumnNames.letterToColumn('E'),
             serviceMode: {
