@@ -1,4 +1,4 @@
-function onEdit() {
+/*function onEdit() {
 
   var ss = SpreadsheetApp.getActiveSpreadsheet();
 
@@ -20,4 +20,4 @@ function onEdit() {
   sheetservicesheet.getRange("E9").setValue(cellunitserialno);
 
 
-}
+}*/
