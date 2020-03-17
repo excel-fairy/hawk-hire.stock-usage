@@ -37,41 +37,39 @@ function exportPartsToStockUsageSheet() {
 function getPartsInServiceMode() {
     var beforeAdditionalPartsKey = 'Part no';
     var stopKey = 'Comments';
+
     var firstPartsRow = SPREADSHEET.sheets.service.serviceMode.firstEntryRow;
-    var nonFilteredParts = getPartsWithQuantityNonFiltered(firstPartsRow);
-    var filteredParts = filterPartsForExport(nonFilteredParts);
+    var parts = getPartsWithQuantityNonFiltered(firstPartsRow);
 
-    var beforeAdditionalPartsIndex = getIndexOfKeyIn2DArray(filteredParts, beforeAdditionalPartsKey);
-    var stopIndex = getIndexOfKeyIn2DArray(filteredParts, stopKey);
-    var replaceParts = filteredParts.slice(0, beforeAdditionalPartsIndex);
-    var additionalParts = filteredParts.slice(beforeAdditionalPartsIndex + 1, stopIndex);
+    var beforeAdditionalPartsIndex = getIndexOfKeyIn2DArray(parts, beforeAdditionalPartsKey);
+    var stopIndex = getIndexOfKeyIn2DArray(parts, stopKey);
 
-    var serviceSheet = SPREADSHEET.sheets.service.sheet;
-    var date = serviceSheet.getRange(SPREADSHEET.sheets.service.taskDateCell).getValue();
-    var equipmentNo = serviceSheet.getRange(SPREADSHEET.sheets.service.equipmentNumberCell).getValue();
-    var type = getEquipmentType();
-    var task = serviceSheet.getRange(SPREADSHEET.sheets.service.taskTypeCell).getValue();
+    var retVal = [];
 
-    var transformedReplaceParts = replaceParts.map(function (e) {
-        return [date, equipmentNo, type, task, e[2], e[3]];
-    });
+    var replaceParts = parts.slice(0, beforeAdditionalPartsIndex);
+    var clientSuppliedPartsReplace = getClientSuppliedPart(replaceParts);
+    if(!clientSuppliedPartsReplace) {
+        retVal = retVal.concat(replaceParts)
+    }
 
-    var transformeAdditionalParts = additionalParts.map(function (e) {
-        return [date, equipmentNo, type, task, e[2], e[3]];
-    });
+    var additionalParts = parts.slice(beforeAdditionalPartsIndex + 1, stopIndex);
+    var clientSuppliedPartsAdditional = getClientSuppliedPart(additionalParts);
+    if(!clientSuppliedPartsAdditional) {
+        retVal = retVal.concat(additionalParts)
+    }
 
-    var nbHours = getTotalNumberOfHoursOfTheJob(nonFilteredParts);
-    var totalNumberOfHours = [date, equipmentNo, type, task, 'Labour', nbHours];
-
-    var retVal = transformedReplaceParts.concat(transformeAdditionalParts);
-    retVal.push(totalNumberOfHours);
-    return retVal;
+    return buildServiceSheetRowToStockUsageRow(retVal);
 }
 
 function getPartsInRepairMode() {
     var firstPartsRow = SPREADSHEET.sheets.service.repairMode.firstEntryRow;
     var nonFilteredParts = getPartsWithQuantityNonFiltered(firstPartsRow);
-    var filteredParts = filterPartsForExport(nonFilteredParts);
+
+    return buildServiceSheetRowToStockUsageRow(nonFilteredParts);
+}
+
+function buildServiceSheetRowToStockUsageRow(parts) {
+    var filteredParts = filterPartsForExport(parts);
 
     var serviceSheet = SPREADSHEET.sheets.service.sheet;
     var date = serviceSheet.getRange(SPREADSHEET.sheets.service.taskDateCell).getValue();
@@ -83,10 +81,13 @@ function getPartsInRepairMode() {
         return [date, equipmentNo, type, task, e[2], e[3]];
     });
 
-    var nbHours = getTotalNumberOfHoursOfTheJob(nonFilteredParts);
-    var totalNumberOfHours = [date, equipmentNo, type, task, 'Labour', nbHours];
+    var nbHours = getTotalNumberOfHoursOfTheJob(parts);
+    if(nbHours) {
+        // A total number of hours has been found in the parts list
+        var totalNumberOfHours = [date, equipmentNo, type, task, 'Labour', nbHours];
+        retVal.push(totalNumberOfHours);
+    }
 
-    retVal.push(totalNumberOfHours);
     return retVal;
 }
 
@@ -104,19 +105,36 @@ function getTotalNumberOfHoursOfTheJob(parts) {
     var totalNumberOfHoursRow = parts.filter(function (e) {
         return e[0] === SPREADSHEET.sheets.service.specialPartsCellsContents.totalNumberHoursOfJob;
     })[0]; // We know there is exactly one row that matches the filter
+    if(!totalNumberOfHoursRow) {
+        return undefined;
+    }
     return totalNumberOfHoursRow[3];
 }
 
+function getClientSuppliedPart(parts) {
+    var tickChar = "\u2714";
+
+    var clientSuppliedPartsRow = parts.filter(function (e) {
+        return e[0] === SPREADSHEET.sheets.service.specialPartsCellsContents.clientSuppliedParts;
+    })[0]; // We know there is exactly one row that matches the filter
+    if(!clientSuppliedPartsRow) {
+        return false;
+    }
+    return clientSuppliedPartsRow[3] === tickChar;
+}
+
 function sendPartsToStockUsageSheet(parts) {
-    var dbSheet = getStockUsageSheet();
-    if(dbSheet != null) {
-        var firstEmptyRow = getStockUsageSheetFirstEmptyRow();
-        var  insertRange = dbSheet.getRange(
-            firstEmptyRow,
-            STOCK_USAGE_SPREADSHEET.partsFirstCol,
-            parts.length,
-            STOCK_USAGE_SPREADSHEET.partsLastCol - STOCK_USAGE_SPREADSHEET.partsFirstCol + 1);
-        insertRange.setValues(parts);
+    if(parts.length > 0) {
+        var dbSheet = getStockUsageSheet();
+        if(dbSheet != null) {
+            var firstEmptyRow = getStockUsageSheetFirstEmptyRow();
+            var  insertRange = dbSheet.getRange(
+                firstEmptyRow,
+                STOCK_USAGE_SPREADSHEET.partsFirstCol,
+                parts.length,
+                STOCK_USAGE_SPREADSHEET.partsLastCol - STOCK_USAGE_SPREADSHEET.partsFirstCol + 1);
+            insertRange.setValues(parts);
+        }
     }
 }
 
