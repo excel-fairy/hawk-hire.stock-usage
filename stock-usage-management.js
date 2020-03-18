@@ -56,6 +56,8 @@ function getPartsInServiceMode() {
     var clientSuppliedPartsAdditional = getClientSuppliedPart(additionalParts);
     if(!clientSuppliedPartsAdditional) {
         retVal = retVal.concat(additionalParts)
+    } else {
+        retVal.push(extractTotalNumberOfHoursOfTheJob(additionalParts))
     }
 
     return buildServiceSheetRowToStockUsageRow(retVal);
@@ -101,10 +103,14 @@ function filterPartsForExport(parts) {
     });
 }
 
-function getTotalNumberOfHoursOfTheJob(parts) {
-    var totalNumberOfHoursRow = parts.filter(function (e) {
+function extractTotalNumberOfHoursOfTheJob(parts) {
+    return parts.filter(function (e) {
         return e[0] === SPREADSHEET.sheets.service.specialPartsCellsContents.totalNumberHoursOfJob;
     })[0]; // We know there is exactly one row that matches the filter
+}
+
+function getTotalNumberOfHoursOfTheJob(parts) {
+    var totalNumberOfHoursRow = extractTotalNumberOfHoursOfTheJob(parts);
     if(!totalNumberOfHoursRow) {
         return undefined;
     }
