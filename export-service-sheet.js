@@ -116,5 +116,7 @@ function createExportSubFoldersIfNotExist(baseFolderId){
         if(folderName !== '' && !baseFolder.getFoldersByName(folderName).hasNext())
             baseFolder.createFolder(folderName);
     }
-    baseFolder.createFolder("Other");
+    var otherFolderName = 'Other';
+    if(!baseFolder.getFoldersByName(otherFolderName).hasNext())
+        baseFolder.createFolder(otherFolderName);
 }
